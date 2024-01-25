@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE ExplicitForAll #-}
+{-# LANGUAGE DerivingVia #-}
 
 import Data.Kind
 
@@ -38,3 +39,17 @@ instance Select Maybe where
 instance Select [] where
     empty = []
     pick = (<>)
+
+--the deriving via stuff
+
+newtype Sel (f :: Type -> Type) (a :: Type) = Sel (f a)
+
+instance (Select f) => Semigroup (Sel f a) where
+    (Sel a) <> (Sel b) = Sel (pick a b)
+
+instance (Select f) => Monoid (Sel f a) where
+    mempty = Sel empty
+
+newtype MyMaybe a = MyMaybe (Maybe a)
+    deriving Show
+    deriving (Semigroup, Monoid)
